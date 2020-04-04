@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  reptile:
+    container_name: system_test_reptile
+    build:
+      context: ..
+    ports:
+      - "2600:2600"
