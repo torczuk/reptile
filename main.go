@@ -2,21 +2,22 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
+	"github.com/torczuk/reptile/request/client"
 	"net"
 	"os"
+	"log"
 )
 
 const (
-	VIEW_NUMBER   = 0
-	OP_NUMBER     = 0
-	COMMIT_NUMBER = 0
+	REQUEST = "REQUEST"
 )
 
 func main() {
 	l, err := net.Listen("tcp", "localhost:2600")
 	if err != nil {
-		fmt.Println("Can't start server", err.Error())
+		log.Println("Can't start server", err.Error())
 		os.Exit(1)
 	}
 	defer l.Close()
@@ -33,12 +34,15 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	bytes, err := bufio.NewReader(conn).ReadBytes('\n')
+	method, err := bufio.NewReader(conn).ReadBytes(' ')
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
+		conn.Close()
 	}
-	request := string(bytes)
-	fmt.Print("Receive: " + request)
-	conn.Write([]byte("Response: " + request))
-	conn.Close()
+	if bytes.Equal(method, []byte(REQUEST)) {
+		client.HandleRequest(conn)
+	} else {
+		fmt.Println("Unknown method: " + string(method))
+		conn.Close()
+	}
 }
