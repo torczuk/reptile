@@ -14,7 +14,7 @@ type ClientRequest struct {
 	requestNum int
 }
 
-func HandleRequest(conn net.Conn) {
+func Handle(conn net.Conn) {
 	bytes, err := bufio.NewReader(conn).ReadBytes('\n')
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())

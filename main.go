@@ -40,7 +40,7 @@ func handleRequest(conn net.Conn) {
 		conn.Close()
 	}
 	if bytes.Equal(method, []byte(REQUEST)) {
-		client.HandleRequest(conn)
+		client.Handle(conn)
 	} else {
 		fmt.Println("Unknown method: " + string(method))
 		conn.Close()
