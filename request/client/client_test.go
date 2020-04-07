@@ -1,8 +1,7 @@
 package client
 
 import (
-	"fmt"
-	"reflect"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -12,21 +11,28 @@ func TestCreateClientRequest_CreateRequest(t *testing.T) {
 	}
 
 	request, err := CreateRequest("REQUEST exec-operation client-id-1 1")
-	if err != nil {
-		t.Error(err)
-	}
 
-	if !reflect.DeepEqual(expectedRequest, request) {
-		t.Error(fmt.Sprintf("Require: %#v Got: %#v", expectedRequest, request))
-	}
+	assert.Nil(t, err)
+	assert.Equal(t, expectedRequest, request)
 }
 
 func TestCreateClientRequest_InvalidRequest(t *testing.T) {
-	_, err := CreateRequest("REQUEST exec-operation client-id-1")
+	req, err := CreateRequest("REQUEST exec-operation client-id-1")
 
-	message := fmt.Sprint(err)
+	assert.Nil(t, req)
+	assert.EqualError(t, err, "wrong req: [REQUEST exec-operation client-id-1]")
+}
 
-	if message != "wrong req: [REQUEST exec-operation client-id-1]" {
-		t.Error(fmt.Sprintf("Require: %#v Got: %#v", "wrong req REQUEST exec-operation client-id-1", message))
-	}
+func TestCreateClientRequest_InvalidRequestType(t *testing.T) {
+	req, err := CreateRequest("ABC exec-operation client-id-1 1")
+
+	assert.Nil(t, req)
+	assert.EqualError(t, err, "wrong req: [ABC exec-operation client-id-1 1]")
+}
+
+func TestCreateClientRequest_InvalidRequestNum(t *testing.T) {
+	req, err := CreateRequest("REQUEST exec-operation client-id-1 x")
+
+	assert.Nil(t, req)
+	assert.EqualError(t, err, "wrong req num: [REQUEST exec-operation client-id-1 x]")
 }

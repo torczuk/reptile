@@ -29,17 +29,13 @@ func Handle(conn net.Conn) {
 func CreateRequest(request string) (req *ClientRequest, err error) {
 	splited := strings.Split(request, " ")
 
-	if len(splited) != 4 {
+	if len(splited) != 4 || splited[0] != "REQUEST" {
 		return nil, fmt.Errorf("wrong req: [%s]", request)
-	}
-
-	if splited[0] != "REQUEST" {
-		return nil, fmt.Errorf("wrong request type: [%s]", request)
 	}
 
 	requestNum, err := strconv.Atoi(splited[3])
 	if err != nil {
-		return nil, fmt.Errorf("wrong request num: [%s]", request)
+		return nil, fmt.Errorf("wrong req num: [%s]", request)
 	}
 	return &ClientRequest{operation: splited[1], clientId: splited[2], requestNum: requestNum}, nil
 }
