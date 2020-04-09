@@ -8,6 +8,7 @@ clean:
 	mkdir $(PWD)/bin
 
 test:
+	go test -v github.com/torczuk/reptile/request/client
 	pushd test; $(PWD)/test/run.sh; popd
 
 build:

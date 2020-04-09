@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAbs(t *testing.T) {
+func TestResponseFromServer(t *testing.T) {
 	con, err := net.Dial("localhost", "2600")
 	if err != nil {
 		t.Error(err)
