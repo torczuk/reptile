@@ -5,9 +5,9 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/torczuk/reptile/request/client"
+	"log"
 	"net"
 	"os"
-	"log"
 )
 
 const (
@@ -34,15 +34,15 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	method, err := bufio.NewReader(conn).ReadBytes(' ')
+	request, _, err := bufio.NewReader(conn).ReadLine()
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 		conn.Close()
 	}
-	if bytes.Equal(method, []byte(REQUEST)) {
-		client.Handle(conn)
+	if bytes.HasPrefix(request, []byte(REQUEST)) {
+		client.Handle(request, conn)
 	} else {
-		fmt.Println("Unknown method: " + string(method))
+		fmt.Println("unknown method in: " + string(request))
 		conn.Close()
 	}
 }

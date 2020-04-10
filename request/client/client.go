@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/torczuk/reptile/state"
 	"net"
@@ -16,14 +15,8 @@ var replConf = &state.ReplicaState{
 	ClientTable: &state.ClientTable{Mapping: make(map[string]*state.ClientResponse)},
 }
 
-func Handle(conn net.Conn) {
-	bytes, err := bufio.NewReader(conn).ReadBytes('\n')
-	if err != nil {
-		fmt.Println("Error reading:", err.Error())
-		conn.Close()
-	}
-
-	cliReq, err := CreateRequest(string(bytes))
+func Handle(request []byte, conn net.Conn) {
+	cliReq, err := CreateRequest(string(request))
 	cliRes, err := Execute(cliReq, replConf.ClientTable)
 
 	if err != nil {

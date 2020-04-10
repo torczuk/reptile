@@ -12,12 +12,12 @@ func TestResponseFromServer(t *testing.T) {
 	}
 	defer con.Close()
 
-	res, err := con.Write([]byte("hello"))
+	res, err := con.Write([]byte("REQUEST NoOp test-client-1 1"))
 	if err != nil {
 		t.Error(err)
 	}
 
-	if "Response: hello" != string(res) {
+	if "Response: NoOp" != string(res) {
 		t.Error("Expected: Response: hello, got : " + string(res))
 	}
 }
