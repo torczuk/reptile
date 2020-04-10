@@ -3,28 +3,17 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"github.com/torczuk/reptile/state"
 	"net"
 	"strconv"
 	"strings"
 )
 
-type ClientRequest struct {
-	operation  string
-	clientId   string
-	requestNum int
-}
-
-type ClientReponse struct {
-	requestNum int
-	response   []byte
-}
-
-type ClientTable struct {
-	mapping map[string]*ClientReponse
-}
-
-var cliTable = &ClientTable{
-	mapping: make(map[string]*ClientReponse),
+var replConf = &state.ReplicaState{
+	OpNum:       0,
+	Log:         make([]int, 0),
+	CommitNum:   0,
+	ClientTable: &state.ClientTable{Mapping: make(map[string]*state.ClientResponse)},
 }
 
 func Handle(conn net.Conn) {
@@ -35,18 +24,18 @@ func Handle(conn net.Conn) {
 	}
 
 	cliReq, err := CreateRequest(string(bytes))
-	cliRes, err := Execute(cliReq, cliTable)
+	cliRes, err := Execute(cliReq, replConf.ClientTable)
 
 	if err != nil {
 		conn.Write([]byte("Response: " + err.Error()))
 	}
 	if cliRes != nil {
-		conn.Write(cliRes.response)
+		conn.Write(cliRes.Response)
 	}
 	conn.Close()
 }
 
-func CreateRequest(request string) (req *ClientRequest, err error) {
+func CreateRequest(request string) (req *state.ClientRequest, err error) {
 	splited := strings.Split(request, " ")
 
 	if len(splited) != 4 || splited[0] != "REQUEST" {
@@ -57,10 +46,10 @@ func CreateRequest(request string) (req *ClientRequest, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("wrong req num: [%s]", request)
 	}
-	return &ClientRequest{operation: splited[1], clientId: splited[2], requestNum: requestNum}, nil
+	return &state.ClientRequest{Operation: splited[1], ClientId: splited[2], RequestNum: requestNum}, nil
 }
 
-func Execute(request *ClientRequest, table *ClientTable) (req *ClientReponse, err error) {
+func Execute(request *state.ClientRequest, table *state.ClientTable) (req *state.ClientResponse, err error) {
 	cliRes, cliErr := LastRequest(request, table)
 	if cliErr != nil {
 		return nil, cliErr
@@ -69,17 +58,17 @@ func Execute(request *ClientRequest, table *ClientTable) (req *ClientReponse, er
 		return cliRes, nil
 	}
 	// echo response
-	echo := fmt.Sprintf("Response: %s", request.operation)
-	return &ClientReponse{requestNum: request.requestNum, response: []byte(echo)}, nil
+	echo := fmt.Sprintf("Response: %s", request.Operation)
+	return &state.ClientResponse{RequestNum: request.RequestNum, Response: []byte(echo)}, nil
 }
 
-func LastRequest(request *ClientRequest, table *ClientTable) (req *ClientReponse, err error) {
-	clientId := request.clientId
+func LastRequest(request *state.ClientRequest, table *state.ClientTable) (req *state.ClientResponse, err error) {
+	clientId := request.ClientId
 	last := LastRequestNum(request, table)
-	current := request.requestNum
+	current := request.RequestNum
 
 	if last == current {
-		return table.mapping[clientId], nil
+		return table.Mapping[clientId], nil
 	} else if last > current {
 		return nil, fmt.Errorf("last req num: %v, current was: [%#v]", last, request)
 	} else {
@@ -87,11 +76,11 @@ func LastRequest(request *ClientRequest, table *ClientTable) (req *ClientReponse
 	}
 }
 
-func LastRequestNum(request *ClientRequest, table *ClientTable) int {
-	clientId := request.clientId
-	last := table.mapping[clientId]
+func LastRequestNum(request *state.ClientRequest, table *state.ClientTable) int {
+	clientId := request.ClientId
+	last := table.Mapping[clientId]
 	if last == nil {
 		return 0
 	}
-	return last.requestNum
+	return last.RequestNum
 }
