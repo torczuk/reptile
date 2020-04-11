@@ -47,12 +47,12 @@ func Execute(request *state.ClientRequest, table *state.ClientTable) (req *state
 	if cliErr != nil {
 		return nil, cliErr
 	}
-	if cliRes != nil {
-		return cliRes, nil
+	if cliRes == nil {
+		echo := fmt.Sprintf("Response: %s", request.Operation)
+		cliRes = &state.ClientResponse{RequestNum: request.RequestNum, Response: []byte(echo)}
+		table.Mapping[request.ClientId] = cliRes
 	}
-	// echo response
-	echo := fmt.Sprintf("Response: %s", request.Operation)
-	return &state.ClientResponse{RequestNum: request.RequestNum, Response: []byte(echo)}, nil
+	return cliRes, nil
 }
 
 func LastRequest(request *state.ClientRequest, table *state.ClientTable) (req *state.ClientResponse, err error) {
