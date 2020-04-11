@@ -43,37 +43,14 @@ func CreateRequest(request string) (req *state.ClientRequest, err error) {
 }
 
 func Execute(request *state.ClientRequest, table *state.ClientTable) (req *state.ClientResponse, err error) {
-	cliRes, cliErr := LastRequest(request, table)
+	cliRes, cliErr := table.LastRequest(request)
 	if cliErr != nil {
 		return nil, cliErr
 	}
 	if cliRes == nil {
 		echo := fmt.Sprintf("Response: %s", request.Operation)
 		cliRes = &state.ClientResponse{RequestNum: request.RequestNum, Response: []byte(echo)}
-		table.Mapping[request.ClientId] = cliRes
+		table.SaveRequest(request, cliRes)
 	}
 	return cliRes, nil
-}
-
-func LastRequest(request *state.ClientRequest, table *state.ClientTable) (req *state.ClientResponse, err error) {
-	clientId := request.ClientId
-	last := LastRequestNum(request, table)
-	current := request.RequestNum
-
-	if last == current {
-		return table.Mapping[clientId], nil
-	} else if last > current {
-		return nil, fmt.Errorf("last req num: %v, current was: [%#v]", last, request)
-	} else {
-		return nil, nil
-	}
-}
-
-func LastRequestNum(request *state.ClientRequest, table *state.ClientTable) int {
-	clientId := request.ClientId
-	last := table.Mapping[clientId]
-	if last == nil {
-		return 0
-	}
-	return last.RequestNum
 }

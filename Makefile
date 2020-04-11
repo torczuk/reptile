@@ -9,6 +9,7 @@ clean:
 
 test:
 	go test -v github.com/torczuk/reptile/request/client
+	go test -v github.com/torczuk/reptile/state
 	pushd system_test; $(PWD)/system_test/run.sh; popd
 
 build:
