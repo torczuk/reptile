@@ -15,14 +15,14 @@ const (
 )
 
 func main() {
-	l, err := net.Listen("tcp", "localhost:2600")
+	l, err := net.Listen("tcp", "0.0.0.0:2600")
 	if err != nil {
 		log.Println("Can't start server", err.Error())
 		os.Exit(1)
 	}
 	defer l.Close()
 
-	fmt.Print("Started listening on port 2600")
+	log.Println("started listening on port 2600")
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -35,6 +35,8 @@ func main() {
 
 func handleRequest(conn net.Conn) {
 	request, _, err := bufio.NewReader(conn).ReadLine()
+	log.Printf("handle %v\n", string(request))
+
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 		conn.Close()

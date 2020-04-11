@@ -23,7 +23,7 @@ func Handle(request []byte, conn net.Conn) {
 		conn.Write([]byte("Response: " + err.Error()))
 	}
 	if cliRes != nil {
-		conn.Write(cliRes.Response)
+		conn.Write([]byte(string(cliRes.Response) + "\n"))
 	}
 	conn.Close()
 }

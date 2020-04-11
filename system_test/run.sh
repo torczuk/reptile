@@ -12,7 +12,7 @@ wait_for_port() {
   done
 }
 
-docker-compose up -d
+docker-compose up -d --force-recreate
 
 go test -run system_test
 
