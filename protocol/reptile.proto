@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+service Reptile {
+  rpc Request (ClientRequest) returns (ClientResponse) {}
+}
+
+message ClientRequest {
+  string operation = 1;
+  string clientId = 2;
+  uint32 requestNum = 3;
+}
+
+message ClientResponse {
+  string response = 1;
+  uint32 requestNum = 2;
+}

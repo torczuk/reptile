@@ -1,42 +1,34 @@
 package state
 
-import "fmt"
+import (
+	"fmt"
+	pb "github.com/torczuk/reptile/protocol"
+)
 
 type ReplicaState struct {
 	// ip addresses of replicas
 	Configuration []string
 	// index of ip address
-	ReplicaNum int
+	ReplicaNum uint32
 	// current view number
-	ViewNum int
+	ViewNum uint32
 	// current status
-	Status int
+	Status uint32
 	// most recently received request
-	OpNum int
+	OpNum uint32
 	// log - opNum queue
-	Log []int
+	Log []uint32
 	// last committed opNum
-	CommitNum int
+	CommitNum uint32
 	//client table, contains registered client and its last response
 	ClientTable *ClientTable
 }
 
 type ClientTable struct {
-	Mapping map[string]*ClientResponse
+	Mapping map[string]*pb.ClientResponse
 }
 
-type ClientRequest struct {
-	Operation  string
-	ClientId   string
-	RequestNum int
-}
-
-type ClientResponse struct {
-	RequestNum int
-	Response   []byte
-}
-
-func (t *ClientTable) LastRequest(request *ClientRequest) (req *ClientResponse, err error) {
+func (t *ClientTable) LastRequest(request *pb.ClientRequest) (req *pb.ClientResponse, err error) {
 	clientId := request.ClientId
 	last := t.LastRequestNum(request)
 	current := request.RequestNum
@@ -50,7 +42,7 @@ func (t *ClientTable) LastRequest(request *ClientRequest) (req *ClientResponse, 
 	}
 }
 
-func (t *ClientTable) LastRequestNum(request *ClientRequest) int {
+func (t *ClientTable) LastRequestNum(request *pb.ClientRequest) uint32 {
 	clientId := request.ClientId
 	last := t.Mapping[clientId]
 	if last == nil {
@@ -59,6 +51,6 @@ func (t *ClientTable) LastRequestNum(request *ClientRequest) int {
 	return last.RequestNum
 }
 
-func (t *ClientTable) SaveRequest(request *ClientRequest, res *ClientResponse) {
+func (t *ClientTable) SaveRequest(request *pb.ClientRequest, res *pb.ClientResponse) {
 	t.Mapping[request.ClientId] = res
 }

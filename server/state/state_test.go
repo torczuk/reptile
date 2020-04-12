@@ -3,12 +3,13 @@ package state
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	pro "github.com/torczuk/reptile/protocol"
 	"testing"
 )
 
 func TestLastRequestNum_FirstRequest(t *testing.T) {
-	req := &ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	table := &ClientTable{Mapping: make(map[string]*ClientResponse)}
+	req := &pro.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
+	table := &ClientTable{Mapping: make(map[string]*pro.ClientResponse)}
 
 	last := table.LastRequestNum(req)
 
@@ -16,8 +17,8 @@ func TestLastRequestNum_FirstRequest(t *testing.T) {
 }
 
 func TestLastRequest_FirstRequest(t *testing.T) {
-	req := &ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	table := &ClientTable{Mapping: make(map[string]*ClientResponse)}
+	req := &pro.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
+	table := &ClientTable{Mapping: make(map[string]*pro.ClientResponse)}
 
 	last, err := table.LastRequest(req)
 
@@ -26,10 +27,10 @@ func TestLastRequest_FirstRequest(t *testing.T) {
 }
 
 func TestLastRequest_ReqNumSameThanLast(t *testing.T) {
-	req := &ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	res := &ClientResponse{RequestNum: 1, Response: []byte("2")}
+	req := &pro.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
+	res := &pro.ClientResponse{RequestNum: 1, Response: "2"}
 
-	mapping := make(map[string]*ClientResponse)
+	mapping := make(map[string]*pro.ClientResponse)
 	mapping["client-id-1"] = res
 	table := &ClientTable{Mapping: mapping}
 
@@ -40,10 +41,10 @@ func TestLastRequest_ReqNumSameThanLast(t *testing.T) {
 }
 
 func TestLastRequest_BadRequest_ReqNumLessThanLast(t *testing.T) {
-	req := &ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	res := &ClientResponse{RequestNum: 2, Response: []byte("2")}
+	req := &pro.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
+	res := &pro.ClientResponse{RequestNum: 2, Response: "2"}
 
-	mapping := make(map[string]*ClientResponse)
+	mapping := make(map[string]*pro.ClientResponse)
 	mapping["client-id-1"] = res
 	table := &ClientTable{Mapping: mapping}
 
@@ -54,10 +55,10 @@ func TestLastRequest_BadRequest_ReqNumLessThanLast(t *testing.T) {
 }
 
 func TestLastRequest_NextRequest(t *testing.T) {
-	req := &ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 2}
-	res := &ClientResponse{RequestNum: 1, Response: []byte("2")}
+	req := &pro.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 2}
+	res := &pro.ClientResponse{RequestNum: 1, Response: "2"}
 
-	mapping := make(map[string]*ClientResponse)
+	mapping := make(map[string]*pro.ClientResponse)
 	mapping["client-id-1"] = res
 	table := &ClientTable{Mapping: mapping}
 
