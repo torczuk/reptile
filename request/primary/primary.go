@@ -1,7 +1,8 @@
-package client
+package primary
 
 import (
 	"fmt"
+	"github.com/torczuk/reptile/request/replica"
 	"github.com/torczuk/reptile/state"
 	"net"
 	"strconv"
@@ -52,5 +53,6 @@ func Execute(request *state.ClientRequest, table *state.ClientTable) (req *state
 		cliRes = &state.ClientResponse{RequestNum: request.RequestNum, Response: []byte(echo)}
 		table.SaveRequest(request, cliRes)
 	}
+	replica.Prepare()
 	return cliRes, nil
 }

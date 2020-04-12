@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/torczuk/reptile/request/client"
+	"github.com/torczuk/reptile/request/primary"
 	"log"
 	"net"
 	"os"
@@ -42,7 +42,7 @@ func handleRequest(conn net.Conn) {
 		conn.Close()
 	}
 	if bytes.HasPrefix(request, []byte(REQUEST)) {
-		client.Handle(request, conn)
+		primary.Handle(request, conn)
 	} else {
 		fmt.Println("unknown method in: " + string(request))
 		conn.Close()
