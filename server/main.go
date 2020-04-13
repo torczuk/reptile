@@ -21,7 +21,7 @@ type server struct {
 	pro.UnimplementedReptileServer
 }
 
-func (s *server) ClientRequest(ctx context.Context, in *pro.ClientRequest) (*pro.ClientResponse, error) {
+func (s *server) Request(ctx context.Context, in *pro.ClientRequest) (*pro.ClientResponse, error) {
 	log.Printf("Received: %v", in)
 	return primary.Execute(in, replConf.ClientTable)
 }

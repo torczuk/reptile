@@ -1,6 +1,6 @@
 FROM golang:1.14.1 AS builder
 WORKDIR /go/src/github.com/torczuk/reptile/
-COPY .. .
+COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o reptile .
 
 FROM alpine:3.11.5
