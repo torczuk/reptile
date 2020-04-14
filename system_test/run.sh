@@ -14,6 +14,9 @@ wait_for_port() {
 
 docker-compose up -d --force-recreate
 
-go test -run system_test
+go test
+readonly result=$?
 
 docker-compose down
+
+exit $result

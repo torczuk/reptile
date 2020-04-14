@@ -12,5 +12,5 @@ func TestFirstClientRequest(t *testing.T) {
 	res, err := c.Request("NoOp")
 	assert.Nil(t, err)
 	assert.Equal(t, res.Response, "Response: NoOp")
-	assert.Equal(t, res.RequestNum, 1)
+	assert.Equal(t, res.RequestNum, uint32(1))
 }
