@@ -6,6 +6,8 @@ services:
       context: ..
     ports:
       - "2600:2600"
+    environment:
+      - 'SERVERS=172.28.1.1 172.28.1.2 172.28.1.3'
     networks:
       reptile_net:
         ipv4_address: 172.28.1.1
@@ -16,16 +18,20 @@ services:
       context: ..
     ports:
       - "2600"
+    environment:
+      - 'SERVERS=172.28.1.1 172.28.1.2 172.28.1.3'
     networks:
       reptile_net:
         ipv4_address: 172.28.1.2
 
   reptile3:
-    container_name: system_test_reptile2
+    container_name: system_test_reptile3
     build:
       context: ..
     ports:
       - "2600"
+    environment:
+      - 'SERVERS=172.28.1.1 172.28.1.2 172.28.1.3'
     networks:
       reptile_net:
         ipv4_address: 172.28.1.3

@@ -21,13 +21,13 @@ func InterfaceAddresses() ([]string, error) {
 	return address, nil
 }
 
-func IsAddressInNetwork(address string, network string) bool {
+func IsNetworkIpAddress(address string, network string) bool {
 	ip := net.ParseIP(address)
-	_, subnet, err := net.ParseCIDR(network)
+	networkIp, _, err := net.ParseCIDR(network)
 	if err != nil {
 		return false
 	}
-	return subnet.Contains(ip)
+	return ip.Equal(networkIp)
 }
 
 func SortIPAddresses(ips []string) {
@@ -43,7 +43,7 @@ func MyAddress(ips []string) (int, error) {
 	}
 	for i, ip := range ips {
 		for _, add := range addresses {
-			if IsAddressInNetwork(ip, add) {
+			if IsNetworkIpAddress(ip, add) {
 				return i, nil
 			}
 		}

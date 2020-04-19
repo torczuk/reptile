@@ -10,7 +10,7 @@ func TestIsAddressInNetwork_InSubnet(t *testing.T) {
 	address := "192.168.1.104"
 	subnet := "192.168.1.104/24"
 
-	inSubnet := IsAddressInNetwork(address, subnet)
+	inSubnet := IsNetworkIpAddress(address, subnet)
 	assert.True(t, inSubnet, fmt.Sprintf("address %v should be in %v", address, subnet))
 }
 
@@ -18,7 +18,7 @@ func TestIsAddressInNetwork_OutsideSubnet(t *testing.T) {
 	address := "192.168.0.104"
 	subnet := "192.168.1.104/24"
 
-	inSubnet := IsAddressInNetwork(address, subnet)
+	inSubnet := IsNetworkIpAddress(address, subnet)
 	assert.False(t, inSubnet, fmt.Sprintf("address %v shouldn't be in %v", address, subnet))
 }
 
