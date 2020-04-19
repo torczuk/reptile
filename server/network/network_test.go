@@ -36,3 +36,11 @@ func TestSortIPAddresses(t *testing.T) {
 
 	assert.Equal(t, ips, []string{"10.152.16.23", "69.52.220.44", "192.168.1.1", "192.168.1.2", "192.168.2.1"})
 }
+
+func TestMyAddress(t *testing.T) {
+	ips := []string{"118.212.197.92", "127.0.0.1"}
+
+	ip, err := MyAddress(ips)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, ip)
+}

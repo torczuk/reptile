@@ -8,6 +8,8 @@ import (
 type ReplicaState struct {
 	// ip addresses of replicas
 	Configuration []string
+	// repilica ip address stored in configuration
+	MyAddress int
 	// index of ip address
 	ReplicaNum uint32
 	// current view number

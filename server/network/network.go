@@ -2,6 +2,8 @@ package network
 
 import (
 	"bytes"
+	"fmt"
+	"log"
 	"net"
 	"sort"
 )
@@ -32,4 +34,19 @@ func SortIPAddresses(ips []string) {
 	sort.Slice(ips, func(i, j int) bool {
 		return bytes.Compare(net.ParseIP(ips[i]), net.ParseIP(ips[j])) < 0
 	})
+}
+
+func MyAddress(ips []string) (int, error) {
+	addresses, err := InterfaceAddresses()
+	if err != nil {
+		log.Fatalf("can't obtain interface addresses %v", err)
+	}
+	for i, ip := range ips {
+		for _, add := range addresses {
+			if IsAddressInNetwork(ip, add) {
+				return i, nil
+			}
+		}
+	}
+	return 0, fmt.Errorf("address not on the list %v", ips)
 }
