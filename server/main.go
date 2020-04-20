@@ -37,14 +37,7 @@ func main() {
 	}
 	replConf.Configuration = servers
 	replConf.MyAddress = myAddress
-
-	log.Printf("my address: %v", servers[myAddress])
-	if myAddress == 0 {
-		log.Printf("i'm primary")
-	} else {
-		log.Printf("i'm replica: %v", myAddress)
-	}
-
+	log.Print(replConf)
 	listener, err := net.Listen("tcp", "0.0.0.0:2600")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

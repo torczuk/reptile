@@ -67,3 +67,20 @@ func TestLastRequest_NextRequest(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Nil(t, last)
 }
+
+func TestMyIp_WhenDefined(t *testing.T) {
+	state := &ReplicaState{Configuration: []string{"192.168.1.2", "192.168.1.1"}, MyAddress: 1}
+
+	myIp := state.MyIp()
+
+	assert.Equal(t, "192.168.1.1", myIp)
+}
+
+
+func TestMyIp_WhenNotDefined(t *testing.T) {
+	state := &ReplicaState{Configuration: []string{}, MyAddress: 0}
+
+	myIp := state.MyIp()
+
+	assert.Equal(t, "", myIp)
+}
