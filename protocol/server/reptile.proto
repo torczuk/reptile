@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+service Replica {
+  rpc Prepare (PrepareReplica) returns (PrepareOk) {}
+}
+
+message PrepareReplica {
+  uint32 view = 1;
+  string clientMessage = 2;
+  uint32 operationNum = 3;
+  uint32 commitNum = 4;
+}
+
+message PrepareOk {
+  uint32 view = 1;
+  uint32 operationNum = 2;
+  uint32 replicaNum = 3;
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	client "github.com/torczuk/reptile/protocol/client"
+	server "github.com/torczuk/reptile/protocol/server"
 	"github.com/torczuk/reptile/server/config"
 	"github.com/torczuk/reptile/server/network"
 	"github.com/torczuk/reptile/server/request/primary"
@@ -19,13 +20,18 @@ var replConf = &state.ReplicaState{
 	ClientTable: &state.ClientTable{Mapping: make(map[string]*client.ClientResponse)},
 }
 
-type server struct {
+type reptileServer struct {
 	client.UnimplementedReptileServer
+	server.UnimplementedReplicaServer
 }
 
-func (s *server) Request(ctx context.Context, in *client.ClientRequest) (*client.ClientResponse, error) {
+func (s *reptileServer) Request(ctx context.Context, in *client.ClientRequest) (*client.ClientResponse, error) {
 	log.Printf("Received: %v", in)
-	return primary.Execute(in, replConf.ClientTable)
+return primary.Execute(in, replConf.ClientTable)
+}
+
+func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (*server.PrepareOk, error) {
+	return &server.PrepareOk{View: 1, OperationNum: 1, ReplicaNum: 1}, nil
 }
 
 func main() {
@@ -43,7 +49,8 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	client.RegisterReptileServer(s, &server{})
+	client.RegisterReptileServer(s, &reptileServer{})
+	server.RegisterReplicaServer(s, &reptileServer{})
 
 	if err := s.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
