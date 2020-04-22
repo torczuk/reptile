@@ -13,7 +13,7 @@ func TestLastRequestNum_FirstRequest(t *testing.T) {
 
 	last := table.LastRequestNum(req)
 
-	assert.Equal(t, last, 0)
+	assert.Equal(t, last, uint32(0))
 }
 
 func TestLastRequest_FirstRequest(t *testing.T) {
