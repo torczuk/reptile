@@ -1,7 +1,7 @@
 package client
 
 import (
-	pb "github.com/torczuk/reptile/protocol"
+	pb "github.com/torczuk/reptile/protocol/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"log"

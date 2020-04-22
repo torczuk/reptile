@@ -2,7 +2,7 @@ package state
 
 import (
 	"fmt"
-	pb "github.com/torczuk/reptile/protocol"
+	client "github.com/torczuk/reptile/protocol/client"
 )
 
 type ReplicaState struct {
@@ -27,10 +27,10 @@ type ReplicaState struct {
 }
 
 type ClientTable struct {
-	Mapping map[string]*pb.ClientResponse
+	Mapping map[string]*client.ClientResponse
 }
 
-func (t *ClientTable) LastRequest(request *pb.ClientRequest) (req *pb.ClientResponse, err error) {
+func (t *ClientTable) LastRequest(request *client.ClientRequest) (req *client.ClientResponse, err error) {
 	clientId := request.ClientId
 	last := t.LastRequestNum(request)
 	current := request.RequestNum
@@ -44,7 +44,7 @@ func (t *ClientTable) LastRequest(request *pb.ClientRequest) (req *pb.ClientResp
 	}
 }
 
-func (t *ClientTable) LastRequestNum(request *pb.ClientRequest) uint32 {
+func (t *ClientTable) LastRequestNum(request *client.ClientRequest) uint32 {
 	clientId := request.ClientId
 	last := t.Mapping[clientId]
 	if last == nil {
@@ -53,7 +53,7 @@ func (t *ClientTable) LastRequestNum(request *pb.ClientRequest) uint32 {
 	return last.RequestNum
 }
 
-func (t *ClientTable) SaveRequest(request *pb.ClientRequest, res *pb.ClientResponse) {
+func (t *ClientTable) SaveRequest(request *client.ClientRequest, res *client.ClientResponse) {
 	t.Mapping[request.ClientId] = res
 }
 
