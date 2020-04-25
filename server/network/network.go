@@ -48,5 +48,5 @@ func MyAddress(ips []string) (int, error) {
 			}
 		}
 	}
-	return 0, fmt.Errorf("address not on the list %v", ips)
+	return 0, fmt.Errorf("address '%v' not on the list %v", ips, addresses)
 }

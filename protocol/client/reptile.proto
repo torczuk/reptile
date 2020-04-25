@@ -1,9 +1,11 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
 package pb;
 
 service Reptile {
   rpc Request (ClientRequest) returns (ClientResponse) {}
+  rpc Log (google.protobuf.Empty) returns (stream ClientLog) {}
 }
 
 message ClientRequest {
@@ -15,4 +17,9 @@ message ClientRequest {
 message ClientResponse {
   string response = 1;
   uint32 requestNum = 2;
+}
+
+message ClientLog {
+  string log = 1;
+  string clientId = 2;
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/golang/protobuf/ptypes/empty"
 	client "github.com/torczuk/reptile/protocol/client"
 	server "github.com/torczuk/reptile/protocol/server"
 	"github.com/torczuk/reptile/server/config"
@@ -26,8 +27,14 @@ type reptileServer struct {
 }
 
 func (s *reptileServer) Request(ctx context.Context, in *client.ClientRequest) (*client.ClientResponse, error) {
-	log.Printf("Received: %v", in)
-return primary.Execute(in, replConf.ClientTable)
+	log.Printf("new request: %v", in)
+	return primary.Execute(in, replConf.ClientTable)
+}
+
+func (s *reptileServer) Log(req *empty.Empty, stream client.Reptile_LogServer) error {
+	log.Printf("streamn log")
+	stream.Context().Done()
+	return nil
 }
 
 func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (*server.PrepareOk, error) {

@@ -11,8 +11,8 @@ wait_for_port() {
     status=$(echo $?)
   done
 }
-
-docker-compose up -d --force-recreate
+docker-compose build
+docker-compose up -d
 
 go test
 readonly result=$?
