@@ -19,7 +19,7 @@ type ReplicaState struct {
 	// most recently received request
 	OpNum uint32
 	// log - opNum queue
-	Log []uint32
+	Log *Log
 	// last committed opNum
 	CommitNum uint32
 	//client table, contains registered client and its last response

@@ -12,8 +12,8 @@ func TestFirstClientRequest(t *testing.T) {
 
 	res, err := c.Request("NoOp")
 	assert.Nil(t, err)
-	assert.Equal(t, res.Response, "Response: NoOp")
-	assert.Equal(t, res.RequestNum, uint32(1))
+	assert.Equal(t, "Response: NoOp", res.Response, )
+	assert.Equal(t, uint32(1), res.RequestNum)
 }
 
 func TestCachedClientRequest(t *testing.T) {
@@ -21,25 +21,25 @@ func TestCachedClientRequest(t *testing.T) {
 
 	res1, err := c1.Request("NoOp")
 	assert.Nil(t, err)
-	assert.Equal(t, res1.Response, "Response: NoOp")
-	assert.Equal(t, res1.RequestNum, uint32(1))
+	assert.Equal(t, "Response: NoOp", res1.Response)
+	assert.Equal(t, uint32(1), res1.RequestNum)
 
 	//same client id and request num, but different operations
 	c2 := &client.ReptileClient{Id: "any-client", Address: ":2600", RequestNum: 1}
 	res2, _ := c2.Request("Different")
-	assert.Equal(t, res2.Response, "Response: NoOp")
-	assert.Equal(t, res2.RequestNum, uint32(1))
+	assert.Equal(t, "Response: NoOp", res2.Response)
+	assert.Equal(t, uint32(1), res2.RequestNum)
 }
 
 func TestReplicaPrepare(t *testing.T) {
-	c1 := &client.ReptileClient{Id: "test-client-1", Address: ":2600", RequestNum: 1}
+	c1 := &client.ReptileClient{Id: "test-client-2", Address: ":2600", RequestNum: 1}
 
-	res1, err := c1.Request("NoOp")
+	res1, err := c1.Request("1+1")
 	assert.Nil(t, err)
-	assert.Equal(t, res1.Response, "Response: NoOp")
-	assert.Equal(t, res1.RequestNum, uint32(1))
+	assert.Equal(t, "Response: 1+1", res1.Response)
+	assert.Equal(t, uint32(1), res1.RequestNum)
 
 	logs, err := c1.Log()
 	assert.Nil(t, err)
-	assert.Contains(t, logs, &pb.ClientLog{ClientId: "test-client-1", Log: "Response: NoOp"})
+	assert.Contains(t, logs, &pb.ClientLog{ClientId: "test-client-2", Log: "1+1"})
 }

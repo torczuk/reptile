@@ -17,7 +17,7 @@ type ReptileClient struct {
 }
 
 // send request to the replica to execute an operation
-func (r *ReptileClient) Request(string) (*pb.ClientResponse, error) {
+func (r *ReptileClient) Request(operation string) (*pb.ClientResponse, error) {
 	conn, err := grpc.Dial(r.Address, grpc.WithInsecure(), grpc.WithBlock())
 	defer conn.Close()
 	if err != nil {
@@ -27,7 +27,7 @@ func (r *ReptileClient) Request(string) (*pb.ClientResponse, error) {
 	client := pb.NewReptileClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	res, err := client.Request(ctx, &pb.ClientRequest{RequestNum: r.RequestNum, ClientId: r.Id, Operation: "NoOp"})
+	res, err := client.Request(ctx, &pb.ClientRequest{RequestNum: r.RequestNum, ClientId: r.Id, Operation: operation})
 	r.RequestNum += 1
 	return res, err
 }

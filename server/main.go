@@ -10,13 +10,15 @@ import (
 	"github.com/torczuk/reptile/server/request/primary"
 	"github.com/torczuk/reptile/server/state"
 	"google.golang.org/grpc"
-	"log"
+	logger "log"
 	"net"
 )
 
+var replicaLog = &state.Log{Sequence: make([]*state.Operation, 0)}
+
 var replConf = &state.ReplicaState{
 	OpNum:       0,
-	Log:         make([]uint32, 0),
+	Log:         replicaLog,
 	CommitNum:   0,
 	ClientTable: &state.ClientTable{Mapping: make(map[string]*client.ClientResponse)},
 }
@@ -27,14 +29,13 @@ type reptileServer struct {
 }
 
 func (s *reptileServer) Request(ctx context.Context, in *client.ClientRequest) (*client.ClientResponse, error) {
-	log.Printf("new request: %v", in)
-	return primary.Execute(in, replConf.ClientTable)
+	logger.Printf("new request: %v", in)
+	return primary.Execute(in, replConf)
 }
 
 func (s *reptileServer) Log(req *empty.Empty, stream client.Reptile_LogServer) error {
-	log.Printf("streamn log")
-	stream.Context().Done()
-	return nil
+	logger.Printf("streamn log")
+	return primary.Log(replConf, stream)
 }
 
 func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (*server.PrepareOk, error) {
@@ -46,20 +47,20 @@ func main() {
 	network.SortIPAddresses(servers)
 	myAddress, err := network.MyAddress(servers)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 	replConf.Configuration = servers
 	replConf.MyAddress = myAddress
-	log.Print(replConf)
+	logger.Print(replConf)
 	listener, err := net.Listen("tcp", "0.0.0.0:2600")
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		logger.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	client.RegisterReptileServer(s, &reptileServer{})
 	server.RegisterReplicaServer(s, &reptileServer{})
 
 	if err := s.Serve(listener); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		logger.Fatalf("failed to serve: %v", err)
 	}
 }
