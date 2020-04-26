@@ -11,6 +11,7 @@ test:
 	go test -v github.com/torczuk/reptile/server/request/primary
 	go test -v github.com/torczuk/reptile/server/network
 	go test -v github.com/torczuk/reptile/server/state
+	go test -v github.com/torczuk/reptile/server/config
 	#pushd system_test; $(PWD)/system_test/run.sh; popd
 
 build:
