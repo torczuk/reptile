@@ -7,21 +7,21 @@ import (
 	logger "log"
 )
 
-func Execute(request *client.ClientRequest, replState *state.ReplicaState) (req *client.ClientResponse, err error) {
+func Execute(request *client.ClientRequest, replState *state.ReplicaState) (res *client.ClientResponse, err error) {
 	table := replState.ClientTable
 	log := replState.Log
 
-	cliRes, cliErr := table.LastRequest(request)
+	res, cliErr := table.LastRequest(request)
 	if cliErr != nil {
 		return nil, cliErr
 	}
-	if cliRes == nil {
+	if res == nil {
 		echo := fmt.Sprintf("Response: %s", request.Operation)
-		cliRes = &client.ClientResponse{RequestNum: request.RequestNum, Response: echo}
-		table.SaveRequest(request, cliRes)
+		res = &client.ClientResponse{RequestNum: request.RequestNum, Response: echo}
+		table.SaveRequest(request, res)
 		log.Add(request.ClientId, request.Operation)
 	}
-	return cliRes, nil
+	return res, nil
 }
 
 func Log(replState *state.ReplicaState, stream client.Reptile_LogServer) (err error) {
