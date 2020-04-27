@@ -8,9 +8,11 @@ service Replica {
 
 message PrepareReplica {
   uint32 view = 1;
-  string clientMessage = 2;
-  uint32 operationNum = 3;
-  uint32 commitNum = 4;
+  string clientOperation = 2;
+  string clientId = 3;
+  uint32 clientReqNum = 4;
+  uint32 operationNum = 5;
+  uint32 commitNum = 6;
 }
 
 message PrepareOk {

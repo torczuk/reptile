@@ -7,6 +7,7 @@ import (
 	server "github.com/torczuk/reptile/protocol/server"
 	"github.com/torczuk/reptile/server/config"
 	"github.com/torczuk/reptile/server/network"
+	"github.com/torczuk/reptile/server/request/backup"
 	"github.com/torczuk/reptile/server/request/primary"
 	"github.com/torczuk/reptile/server/state"
 	"google.golang.org/grpc"
@@ -39,7 +40,8 @@ func (s *reptileServer) Log(req *empty.Empty, stream client.Reptile_LogServer) e
 }
 
 func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (*server.PrepareOk, error) {
-	return &server.PrepareOk{View: 1, OperationNum: 1, ReplicaNum: 1}, nil
+	logger.Printf("prepare %v", in)
+	return backup.Prepare(in, replConf)
 }
 
 func main() {
