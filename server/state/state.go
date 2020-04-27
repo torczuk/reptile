@@ -30,6 +30,12 @@ type ClientTable struct {
 	Mapping map[string]*client.ClientResponse
 }
 
+func NewReplicaState() *ReplicaState {
+	log := &Log{Sequence: make([]*Operation, 0)}
+	table := &ClientTable{Mapping: make(map[string]*client.ClientResponse)}
+	return &ReplicaState{Log: log, ClientTable: table}
+}
+
 func (t *ClientTable) LastRequest(request *client.ClientRequest) (req *client.ClientResponse, err error) {
 	clientId := request.ClientId
 	last := t.LastRequestNum(request)

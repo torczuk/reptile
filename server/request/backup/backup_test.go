@@ -9,32 +9,26 @@ import (
 )
 
 func TestPrepareBackup_RequestOk(t *testing.T) {
-	table := &state.ClientTable{Mapping: make(map[string]*pbc.ClientResponse)}
-	log := &state.Log{Sequence: make([]*state.Operation, 0)}
-	state := &state.ReplicaState{ClientTable: table, Log: log}
+	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
-	res, err := Prepare(request, state)
+	res, err := Prepare(request, replState)
 	assert.Nil(t, err)
-	assert.Equal(t, &pbs.PrepareOk{View: state.ViewNum, OperationNum: request.OperationNum, ReplicaNum: uint32(state.MyAddress)}, res)
+	assert.Equal(t, &pbs.PrepareOk{View: replState.ViewNum, OperationNum: request.OperationNum, ReplicaNum: uint32(replState.MyAddress)}, res)
 }
 
 func TestPrepareBackup_AppendToLog(t *testing.T) {
-	table := &state.ClientTable{Mapping: make(map[string]*pbc.ClientResponse)}
-	log := &state.Log{Sequence: make([]*state.Operation, 0)}
-	replState := &state.ReplicaState{ClientTable: table, Log: log}
+	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
 	Prepare(request, replState)
-	assert.Contains(t, log.Sequence, &state.Operation{Committed: false, Operation: "exec", ClientId: "client-id-1"})
+	assert.Contains(t, replState.Log.Sequence, &state.Operation{Committed: false, Operation: "exec", ClientId: "client-id-1"})
 }
 
 func TestPrepareBackup_MemorizeRequest(t *testing.T) {
-	table := &state.ClientTable{Mapping: make(map[string]*pbc.ClientResponse)}
-	log := &state.Log{Sequence: make([]*state.Operation, 0)}
-	replState := &state.ReplicaState{ClientTable: table, Log: log}
+	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
 	Prepare(request, replState)
-	assert.Equal(t, &pbc.ClientResponse{Response: "Response: exec", RequestNum: uint32(1)}, table.Mapping["client-id-1"])
+	assert.Equal(t, &pbc.ClientResponse{Response: "Response: exec", RequestNum: uint32(1)}, replState.ClientTable.Mapping["client-id-1"])
 }
