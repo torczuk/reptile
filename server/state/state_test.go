@@ -9,7 +9,7 @@ import (
 
 func TestLastRequestNum_FirstRequest(t *testing.T) {
 	req := &client.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	table := &ClientTable{Mapping: make(map[string]*client.ClientResponse)}
+	table := NewClientTable()
 
 	last := table.LastRequestNum(req)
 
@@ -18,7 +18,7 @@ func TestLastRequestNum_FirstRequest(t *testing.T) {
 
 func TestLastRequest_FirstRequest(t *testing.T) {
 	req := &client.ClientRequest{Operation: "1+1", ClientId: "client-id-1", RequestNum: 1}
-	table := &ClientTable{Mapping: make(map[string]*client.ClientResponse)}
+	table := NewClientTable()
 
 	last, err := table.LastRequest(req)
 

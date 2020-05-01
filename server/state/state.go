@@ -30,9 +30,13 @@ type ClientTable struct {
 	Mapping map[string]*client.ClientResponse
 }
 
+func NewClientTable() *ClientTable {
+	return &ClientTable{Mapping: make(map[string]*client.ClientResponse)}
+}
+
 func NewReplicaState() *ReplicaState {
-	log := &Log{Sequence: make([]*Operation, 0)}
-	table := &ClientTable{Mapping: make(map[string]*client.ClientResponse)}
+	log := NewLog()
+	table := NewClientTable()
 	return &ReplicaState{Log: log, ClientTable: table}
 }
 
