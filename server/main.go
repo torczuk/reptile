@@ -24,7 +24,7 @@ type reptileServer struct {
 
 func (s *reptileServer) Request(ctx context.Context, in *client.ClientRequest) (*client.ClientResponse, error) {
 	logger.Printf("new request: %v", in)
-	return primary.Execute(in, replConf)
+	return primary.ExecuteRequest(in, replConf)
 }
 
 func (s *reptileServer) Log(req *empty.Empty, stream client.Reptile_LogServer) error {

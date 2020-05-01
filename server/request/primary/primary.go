@@ -3,6 +3,8 @@ package primary
 import (
 	"fmt"
 	client "github.com/torczuk/reptile/protocol/client"
+	pb "github.com/torczuk/reptile/protocol/server"
+	"github.com/torczuk/reptile/server/reptile"
 	"github.com/torczuk/reptile/server/state"
 	logger "log"
 )
@@ -37,4 +39,27 @@ func Log(replState *state.ReplicaState, stream client.Reptile_LogServer) (err er
 		//}
 	}
 	return err
+}
+
+func NotifyReplica(replica string, prepare *pb.PrepareReplica) (*pb.PrepareOk, error) {
+	reptile := reptile.NewReptileClient(replica)
+	return reptile.Prepare(prepare)
+}
+
+func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState) (*client.ClientResponse, error) {
+	res, err := Execute(request, replState)
+	if err != nil {
+		logger.Printf("error when executing request: %v", err)
+		return nil, err
+	}
+
+	clientReqNum := uint32(len(replState.Log.Sequence))
+	prepare := &pb.PrepareReplica{View: replState.ViewNum, ClientOperation: request.Operation, ClientId: request.ClientId, ClientReqNum: clientReqNum}
+
+	ips := replState.OthersIp()
+	for _, ip := range ips {
+		logger.Printf("preparing replica %v", ip)
+		NotifyReplica(ip, prepare)
+	}
+	return res, nil
 }

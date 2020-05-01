@@ -85,3 +85,14 @@ func (t *ReplicaState) MyIp() string {
 	}
 	return t.Configuration[t.MyAddress]
 }
+
+func (t *ReplicaState) OthersIp() []string {
+	others := make([]string, 0)
+
+	for i, address := range t.Configuration {
+		if i != t.MyAddress {
+			others = append(others, address)
+		}
+	}
+	return others
+}
