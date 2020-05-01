@@ -15,14 +15,7 @@ import (
 	"net"
 )
 
-var replicaLog = &state.Log{Sequence: make([]*state.Operation, 0)}
-
-var replConf = &state.ReplicaState{
-	OpNum:       0,
-	Log:         replicaLog,
-	CommitNum:   0,
-	ClientTable: &state.ClientTable{Mapping: make(map[string]*client.ClientResponse)},
-}
+var replConf = state.NewReplicaState()
 
 type reptileServer struct {
 	client.UnimplementedReptileServer
