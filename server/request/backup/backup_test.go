@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestPrepareBackup_RequestOk(t *testing.T) {
+func Test_PrepareBackup_RequestOk(t *testing.T) {
 	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
@@ -17,7 +17,7 @@ func TestPrepareBackup_RequestOk(t *testing.T) {
 	assert.Equal(t, &pbs.PrepareOk{View: replState.ViewNum, OperationNum: request.OperationNum, ReplicaNum: uint32(replState.MyAddress)}, res)
 }
 
-func TestPrepareBackup_AppendToLog(t *testing.T) {
+func Test_PrepareBackup_AppendToLog(t *testing.T) {
 	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
@@ -25,7 +25,7 @@ func TestPrepareBackup_AppendToLog(t *testing.T) {
 	assert.Contains(t, replState.Log.Sequence, &state.Operation{Committed: false, Operation: "exec", ClientId: "client-id-1"})
 }
 
-func TestPrepareBackup_MemorizeRequest(t *testing.T) {
+func Test_PrepareBackup_MemorizeRequest(t *testing.T) {
 	replState := state.NewReplicaState()
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
