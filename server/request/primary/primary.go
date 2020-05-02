@@ -38,9 +38,12 @@ func Log(replState *state.ReplicaState, stream client.Reptile_LogServer) (err er
 	return err
 }
 
-func NotifyReplica(replica string, prepare *pb.PrepareReplica) (*pb.PrepareOk, error) {
-	reptile := reptile.NewReptileClient(replica)
-	return reptile.Prepare(prepare)
+func NotifyReplica(replicaIp string, prepare *pb.PrepareReplica, c chan *pb.PrepareOk) {
+	reptileCli := reptile.NewReptileClient(replicaIp)
+	res, err := reptileCli.Prepare(prepare)
+	if err == nil {
+		c <- res
+	}
 }
 
 func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState) (*client.ClientResponse, error) {
@@ -53,9 +56,16 @@ func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState
 	prepare := NewPrepareReplica(res.OperationNum, request, replState)
 
 	ips := replState.OthersIp()
+	//wait for all
+	c := make(chan *pb.PrepareOk, len(ips))
+	//send to all replicas
 	for _, ip := range ips {
 		logger.Printf("preparing replica %v", ip)
-		NotifyReplica(ip, prepare)
+		go NotifyReplica(ip, prepare, c)
+	}
+	//wait for all responses
+	for i := 0; i < len(ips); i++ {
+		<-c
 	}
 	return res, nil
 }
