@@ -2,6 +2,7 @@ package state
 
 import (
 	"fmt"
+	pb "github.com/torczuk/reptile/protocol/client"
 )
 
 type ReplicaState struct {
@@ -59,4 +60,12 @@ func (t *ReplicaState) OthersIp() []string {
 		}
 	}
 	return others
+}
+
+func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes string) *pb.ClientResponse {
+	t.OpNum = t.OpNum + 1
+	response := &pb.ClientResponse{RequestNum: request.RequestNum, Response: operationRes, OperationNum: t.OpNum}
+	t.ClientTable.SaveRequest(request, response)
+	t.Log.Add(request.ClientId, request.Operation)
+	return response
 }

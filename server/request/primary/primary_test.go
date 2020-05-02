@@ -13,7 +13,7 @@ func TestExecute_LastClientRequestIsMemorized(t *testing.T) {
 
 	res, err := Execute(request, replState)
 	assert.Nil(t, err)
-	assert.Equal(t, client.NewClientResponse(request.RequestNum, "Response: exec"), res)
+	assert.Equal(t, client.NewClientResponse(request.RequestNum, "Response: exec", uint32(1)), res)
 	assert.Equal(t, res, replState.ClientTable.Mapping["client-1"])
 }
 

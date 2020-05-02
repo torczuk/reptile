@@ -13,7 +13,7 @@ func Prepare(request *pbs.PrepareReplica, replState *state.ReplicaState) (res *p
 	replState.OpNum = replState.OpNum + 1
 
 	cliReq := client.NewClientRequest(request.ClientOperation, request.ClientId, request.ClientReqNum)
-	cliRes := client.NewClientResponse(cliReq.RequestNum, fmt.Sprintf("Response: %v", cliReq.Operation))
+	cliRes := client.NewClientResponse(cliReq.RequestNum, fmt.Sprintf("Response: %v", cliReq.Operation), replState.OpNum)
 
 	replState.ClientTable.SaveRequest(cliReq, cliRes)
 	replState.Log.Add(request.ClientId, request.ClientOperation)

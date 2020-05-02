@@ -17,6 +17,7 @@ message ClientRequest {
 message ClientResponse {
   string response = 1;
   uint32 requestNum = 2;
+  uint32 operationNum = 3;
 }
 
 message ClientLog {

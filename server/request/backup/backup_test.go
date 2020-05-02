@@ -30,5 +30,5 @@ func Test_PrepareBackup_MemorizeRequest(t *testing.T) {
 	request := &pbs.PrepareReplica{View: 1, ClientOperation: "exec", ClientId: "client-id-1", ClientReqNum: uint32(1), OperationNum: uint32(2), CommitNum: 0}
 
 	Prepare(request, replState)
-	assert.Equal(t, &pbc.ClientResponse{Response: "Response: exec", RequestNum: uint32(1)}, replState.ClientTable.Mapping["client-id-1"])
+	assert.Equal(t, &pbc.ClientResponse{Response: "Response: exec", RequestNum: uint32(1), OperationNum: uint32(1)}, replState.ClientTable.Mapping["client-id-1"])
 }

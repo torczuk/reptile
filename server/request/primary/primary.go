@@ -11,17 +11,14 @@ import (
 
 func Execute(request *client.ClientRequest, replState *state.ReplicaState) (res *client.ClientResponse, err error) {
 	table := replState.ClientTable
-	log := replState.Log
 
 	res, cliErr := table.LastRequest(request)
 	if cliErr != nil {
 		return nil, cliErr
 	}
 	if res == nil {
-		echo := fmt.Sprintf("Response: %s", request.Operation)
-		res = &client.ClientResponse{RequestNum: request.RequestNum, Response: echo}
-		table.SaveRequest(request, res)
-		log.Add(request.ClientId, request.Operation)
+		operationRes := fmt.Sprintf("Response: %s", request.Operation)
+		res = replState.RegisterRequest(request, operationRes)
 	}
 	return res, nil
 }
@@ -53,8 +50,7 @@ func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState
 		return nil, err
 	}
 
-	clientReqNum := uint32(len(replState.Log.Sequence))
-	prepare := &pb.PrepareReplica{View: replState.ViewNum, ClientOperation: request.Operation, ClientId: request.ClientId, ClientReqNum: clientReqNum}
+	prepare := NewPrepareReplica(res.OperationNum, request, replState)
 
 	ips := replState.OthersIp()
 	for _, ip := range ips {
@@ -62,4 +58,14 @@ func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState
 		NotifyReplica(ip, prepare)
 	}
 	return res, nil
+}
+
+func NewPrepareReplica(operationNum uint32, request *client.ClientRequest, replState *state.ReplicaState) *pb.PrepareReplica {
+	return &pb.PrepareReplica{
+		View:            replState.ViewNum,
+		ClientOperation: request.Operation,
+		ClientId:        request.ClientId,
+		ClientReqNum:    request.RequestNum,
+		OperationNum:    operationNum,
+		CommitNum:       replState.CommitNum}
 }
