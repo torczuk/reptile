@@ -20,8 +20,8 @@ func NewReptileClient(address string) *ReptileClient {
 }
 
 func (r *ReptileClient) Prepare(prepareReplica *server.PrepareReplica) (*server.PrepareOk, error) {
-	addres := fmt.Sprint("%v:%v", r.Address, PORT)
-	conn, err := grpc.Dial(addres, grpc.WithInsecure(), grpc.WithBlock())
+	address := fmt.Sprintf("%v:%v", r.Address, PORT)
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Printf("can't connect: %v", err)
 		return nil, err
