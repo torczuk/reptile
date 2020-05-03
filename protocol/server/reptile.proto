@@ -4,6 +4,7 @@ package pb;
 
 service Replica {
   rpc Prepare (PrepareReplica) returns (PrepareOk) {}
+  rpc SendHeartBeat (HeartBeat) returns (HeartBeat) {}
 }
 
 message PrepareReplica {
@@ -19,4 +20,8 @@ message PrepareOk {
   uint32 view = 1;
   uint32 operationNum = 2;
   uint32 replicaNum = 3;
+}
+
+message HeartBeat {
+  uint32 commitNum = 1;
 }

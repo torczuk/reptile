@@ -37,6 +37,11 @@ func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (
 	return backup.Prepare(in, replConf)
 }
 
+func (s *reptileServer) SendHeartBeat(ct context.Context, in *server.HeartBeat) (*server.HeartBeat, error) {
+	logger.Printf("heart bean %v", in)
+	return backup.HeartBean(in, replConf)
+}
+
 func main() {
 	servers := config.Servers()
 	network.SortIPAddresses(servers)
