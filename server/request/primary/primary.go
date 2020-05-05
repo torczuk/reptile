@@ -27,13 +27,13 @@ func Log(replState *state.ReplicaState, stream client.Reptile_LogServer) (err er
 	log := replState.Log
 	defer stream.Context().Done()
 	for _, op := range log.Sequence {
-		//if op.Committed {
-		err := stream.Send(&client.ClientLog{Log: op.Operation, ClientId: op.ClientId})
-		if err != nil {
-			logger.Printf("error when log: %v", err)
-			break
+		if op.Committed {
+			err := stream.Send(&client.ClientLog{Log: op.Operation, ClientId: op.ClientId})
+			if err != nil {
+				logger.Printf("error when log: %v", err)
+				break
+			}
 		}
-		//}
 	}
 	return err
 }
@@ -46,8 +46,8 @@ func NotifyReplica(replicaIp string, prepare *pb.PrepareReplica, c chan *pb.Prep
 	}
 }
 
-func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState) (*client.ClientResponse, error) {
-	res, err := Execute(request, replState)
+func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState) (res *client.ClientResponse, err error) {
+	res, err = Execute(request, replState)
 	if err != nil {
 		logger.Printf("error when executing request: %v", err)
 		return nil, err
@@ -67,6 +67,7 @@ func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState
 	for i := 0; i < len(ips); i++ {
 		<-c
 	}
+	_, err = replState.Commit(int(res.OperationNum))
 	return res, nil
 }
 
