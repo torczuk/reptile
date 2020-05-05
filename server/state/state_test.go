@@ -50,7 +50,7 @@ func TestAmIPrimary_WhenBackup(t *testing.T) {
 
 	primary := state.AmIPrimary()
 
-	assert.Equal(t, false, primary, "replica must be primary")
+	assert.Equal(t, true, primary, "replica must be primary")
 }
 
 func TestAmIPrimary_WhenNotDefined(t *testing.T) {

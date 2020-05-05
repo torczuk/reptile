@@ -43,15 +43,22 @@ func (s *reptileServer) SendHeartBeat(ct context.Context, in *server.HeartBeat) 
 }
 
 func main() {
-	servers := config.Servers()
+	configReplicaState(config.Servers(), replConf)
+	registerGRPC()
+}
+
+func configReplicaState(servers []string, replState *state.ReplicaState) {
 	network.SortIPAddresses(servers)
 	myAddress, err := network.MyAddress(servers)
 	if err != nil {
 		logger.Fatal(err)
 	}
-	replConf.Configuration = servers
-	replConf.MyAddress = myAddress
-	logger.Print(replConf)
+	replState.Configuration = servers
+	replState.MyAddress = myAddress
+	logger.Print(replState)
+}
+
+func registerGRPC() {
 	listener, err := net.Listen("tcp", "0.0.0.0:2600")
 	if err != nil {
 		logger.Fatalf("failed to listen: %v", err)
