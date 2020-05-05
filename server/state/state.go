@@ -3,6 +3,7 @@ package state
 import (
 	"fmt"
 	pb "github.com/torczuk/reptile/protocol/client"
+	"strings"
 )
 
 type ReplicaState struct {
@@ -34,7 +35,7 @@ func NewReplicaState() *ReplicaState {
 
 func (t *ReplicaState) String() string {
 	var header string
-	if t.MyAddress == 0 {
+	if t.AmIPrimary() {
 		header = fmt.Sprintf("I'am primary, my ip %v", t.MyIp())
 	} else {
 		header = fmt.Sprintf("I'am backup, my ip %v", t.MyIp())
@@ -60,6 +61,11 @@ func (t *ReplicaState) OthersIp() []string {
 		}
 	}
 	return others
+}
+
+func (t *ReplicaState) AmIPrimary() bool {
+	ip := t.MyIp()
+	return len(t.Configuration) > 0 && strings.Compare(ip, t.Configuration[0]) == 0
 }
 
 func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes string) *pb.ClientResponse {
