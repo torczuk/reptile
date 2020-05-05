@@ -32,3 +32,17 @@ func (r *ReptileClient) Prepare(prepareReplica *server.PrepareReplica) (*server.
 	defer cancel()
 	return client.Prepare(ctx, prepareReplica)
 }
+
+func (r *ReptileClient) SendHeartBeat(beat *server.HeartBeat) (*server.HeartBeat, error) {
+	address := fmt.Sprintf("%v:%v", r.Address, PORT)
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		log.Printf("can't connect: %v", err)
+		return nil, err
+	}
+	defer conn.Close()
+	client := server.NewReplicaClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+	return client.SendHeartBeat(ctx, beat)
+}

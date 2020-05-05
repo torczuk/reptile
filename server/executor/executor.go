@@ -27,7 +27,6 @@ func (e *Executor) Start() {
 			log.Printf("stoping executor ...")
 			return
 		case <-ticker.C:
-			log.Printf("execute task ...")
 			e.task()
 		}
 	}

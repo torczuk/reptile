@@ -6,13 +6,16 @@ import (
 	client "github.com/torczuk/reptile/protocol/client"
 	server "github.com/torczuk/reptile/protocol/server"
 	"github.com/torczuk/reptile/server/config"
+	"github.com/torczuk/reptile/server/executor"
 	"github.com/torczuk/reptile/server/network"
+	"github.com/torczuk/reptile/server/reptile"
 	"github.com/torczuk/reptile/server/request/backup"
 	"github.com/torczuk/reptile/server/request/primary"
 	"github.com/torczuk/reptile/server/state"
 	"google.golang.org/grpc"
 	logger "log"
 	"net"
+	"time"
 )
 
 var replConf = state.NewReplicaState()
@@ -38,12 +41,14 @@ func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (
 }
 
 func (s *reptileServer) SendHeartBeat(ct context.Context, in *server.HeartBeat) (*server.HeartBeat, error) {
-	logger.Printf("heart bean %v", in)
 	return backup.HeartBean(in, replConf)
 }
 
 func main() {
 	configReplicaState(config.Servers(), replConf)
+	if replConf.AmIPrimary() {
+		scheduleHeartBeat(replConf)
+	}
 	registerGRPC()
 }
 
@@ -69,5 +74,16 @@ func registerGRPC() {
 
 	if err := s.Serve(listener); err != nil {
 		logger.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func scheduleHeartBeat(replState *state.ReplicaState) {
+	logger.Printf("scheduling sending heart beat")
+	for _, ip := range replState.OthersIp() {
+		reptileCli := reptile.NewReptileClient(ip)
+		task := func() {
+			reptileCli.SendHeartBeat(&server.HeartBeat{CommitNum: replState.CommitNum})
+		}
+		go executor.NewExecutor(task, 500*time.Millisecond).Start()
 	}
 }
