@@ -69,10 +69,9 @@ func (t *ReplicaState) AmIPrimary() bool {
 }
 
 func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes string) *pb.ClientResponse {
-	t.OpNum = t.OpNum + 1
+	t.OpNum = t.Log.Add(request.ClientId, request.Operation)
 	response := &pb.ClientResponse{RequestNum: request.RequestNum, Response: operationRes, OperationNum: t.OpNum}
 	t.ClientTable.SaveRequest(request, response)
-	t.Log.Add(request.ClientId, request.Operation)
 	return response
 }
 

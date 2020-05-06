@@ -16,9 +16,9 @@ func NewLog() *Log {
 	return &Log{Sequence: make([]*Operation, 0)}
 }
 
-func (l *Log) Add(ClientId string, op string) int {
+func (l *Log) Add(ClientId string, op string) uint32 {
 	l.Sequence = append(l.Sequence, &Operation{Committed: false, Operation: op, ClientId: ClientId})
-	return len(l.Sequence)
+	return uint32(len(l.Sequence) - 1)
 }
 
 func (l *Log) Get(sequenceNum int) *Operation {
