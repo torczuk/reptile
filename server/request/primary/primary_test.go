@@ -11,7 +11,7 @@ func TestExecute_LastClientRequestIsMemorized(t *testing.T) {
 	request := client.NewClientRequest("exec", "client-1", uint32(10))
 	replState := state.NewReplicaState()
 
-	res, err := Execute(request, replState)
+	res, err := ExecuteOnPrimary(request, replState)
 	assert.Nil(t, err)
 	assert.Equal(t, client.NewClientResponse(request.RequestNum, "Response: exec", uint32(0)), res)
 	assert.Equal(t, res, replState.ClientTable.Mapping["client-1"])
@@ -21,7 +21,7 @@ func TestExecute_LastClientRequestIsAppendedToLogAsUnCommittedOperation(t *testi
 	request := client.NewClientRequest("exec", "client-1", uint32(10))
 	replState := state.NewReplicaState()
 
-	Execute(request, replState)
+	ExecuteOnPrimary(request, replState)
 	assert.Contains(t, replState.Log.Sequence, &state.Operation{Committed: false, Operation: "exec", ClientId: "client-1"})
 }
 
@@ -29,8 +29,8 @@ func TestExecute_LastClientRequestIsAppendedToLogOnlyOnce(t *testing.T) {
 	request := client.NewClientRequest("exec", "client-1", uint32(10))
 	replState := state.NewReplicaState()
 
-	Execute(request, replState)
-	Execute(request, replState)
+	ExecuteOnPrimary(request, replState)
+	ExecuteOnPrimary(request, replState)
 	assert.Contains(t, replState.Log.Sequence, &state.Operation{Committed: false, Operation: "exec", ClientId: "client-1"})
 	assert.Len(t, replState.Log.Sequence, 1)
 }

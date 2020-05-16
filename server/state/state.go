@@ -75,12 +75,16 @@ func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes s
 	return response
 }
 
-func (t *ReplicaState) Commit(commitNum int) (uint32, error) {
-	_, err := t.Log.Commit(commitNum)
+func (t *ReplicaState) Commit(operationNum int) (uint32, error) {
+	_, err := t.Log.Commit(operationNum)
 	if err == nil {
-		t.CommitNum = max(uint32(commitNum), t.CommitNum)
+		t.CommitNum = max(uint32(operationNum), t.CommitNum)
 	}
 	return t.CommitNum, err
+}
+
+func (t *ReplicaState) IsCommitted(operationNum int) bool {
+	return t.Log.IsCommitted(operationNum)
 }
 
 func max(x, y uint32) uint32 {

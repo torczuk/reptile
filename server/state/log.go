@@ -25,10 +25,17 @@ func (l *Log) Get(sequenceNum int) *Operation {
 	return l.Sequence[sequenceNum]
 }
 
-func (l *Log) Commit(commitNum int) (int, error) {
-	if commitNum < len(l.Sequence) {
-		l.Sequence[commitNum].Committed = true
-		return commitNum, nil
+func (l *Log) Commit(operationNum int) (int, error) {
+	if operationNum < len(l.Sequence) {
+		l.Sequence[operationNum].Committed = true
+		return operationNum, nil
 	}
-	return commitNum, fmt.Errorf("commitNum: %v bigger than log size %v", commitNum, len(l.Sequence))
+	return operationNum, fmt.Errorf("operationNum: %v bigger than log size %v", operationNum, len(l.Sequence))
+}
+
+func (l *Log) IsCommitted(operationNum int) bool {
+	if operationNum < len(l.Sequence) {
+		return l.Sequence[operationNum].Committed
+	}
+	return false
 }

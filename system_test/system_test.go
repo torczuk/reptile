@@ -4,7 +4,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/torczuk/reptile/client"
 	pb "github.com/torczuk/reptile/protocol/client"
+	logger "log"
 	"testing"
+	"time"
 )
 
 func Test_FirstClientRequest(t *testing.T) {
@@ -51,10 +53,36 @@ func Test_RequestIsReplicatedAcrossAllReplicas(t *testing.T) {
 	assert.Nil(t, err)
 
 	c2 := &client.ReptileClient{Id: "test-client-3", Address: ":2700", RequestNum: 1}
+	await(func() bool {
+		logs, _ := c2.Log()
+		logger.Printf("logs %v", logs)
+		contains := false
+		for _, log := range logs {
+			if log.ClientId == "test-client-3" {
+				contains = true
+				break
+			}
+		}
+		return contains
+	}, 500*time.Millisecond, 5*time.Second)
+
 	logs2, _ := c2.Log()
 	assert.Contains(t, logs2, &pb.ClientLog{ClientId: "test-client-3", Log: "2+2"})
 
 	c3 := &client.ReptileClient{Id: "test-client-3", Address: ":2800", RequestNum: 1}
+	await(func() bool {
+		logs, _ := c3.Log()
+		logger.Printf("logs %v", logs)
+		contains := false
+		for _, log := range logs {
+			if log.ClientId == "test-client-3" {
+				contains = true
+				break
+			}
+		}
+		return contains
+	}, 500*time.Millisecond, 5*time.Second)
+
 	logs3, err := c3.Log()
 	assert.Contains(t, logs3, &pb.ClientLog{ClientId: "test-client-3", Log: "2+2"})
 }

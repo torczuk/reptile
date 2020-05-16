@@ -82,7 +82,8 @@ func scheduleHeartBeat(replState *state.ReplicaState) {
 	for _, ip := range replState.OthersIp() {
 		reptileCli := reptile.NewReptileClient(ip)
 		task := func() {
-			reptileCli.SendHeartBeat(&server.HeartBeat{CommitNum: replState.CommitNum})
+			commitNum := replState.CommitNum
+			reptileCli.SendHeartBeat(&server.HeartBeat{CommitNum: commitNum})
 		}
 		go executor.NewExecutor(task, 500*time.Millisecond).Start()
 	}
