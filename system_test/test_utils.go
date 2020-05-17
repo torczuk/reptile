@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/torczuk/reptile/client"
 	logger "log"
 	"time"
 )
@@ -16,4 +17,8 @@ func await(condition fn, pool time.Duration, maxTime time.Duration) {
 			logger.Fatalf("condition didn't finished within %v", maxTime)
 		}
 	}
+}
+
+func NewClient(id string, address string) *client.ReptileClient {
+	return &client.ReptileClient{Id: "any-client", Address: ":2600", RequestNum: 1}
 }
