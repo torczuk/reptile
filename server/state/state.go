@@ -4,6 +4,7 @@ import (
 	"fmt"
 	pb "github.com/torczuk/reptile/protocol/client"
 	"strings"
+	"sync"
 )
 
 type ReplicaState struct {
@@ -25,12 +26,15 @@ type ReplicaState struct {
 	CommitNum uint32
 	//client table, contains registered client and its last response
 	ClientTable *ClientTable
+
+	//private lock
+	lock *sync.Mutex
 }
 
 func NewReplicaState() *ReplicaState {
 	log := NewLog()
 	table := NewClientTable()
-	return &ReplicaState{Log: log, ClientTable: table}
+	return &ReplicaState{Log: log, ClientTable: table, lock: &sync.Mutex{}}
 }
 
 func (t *ReplicaState) String() string {
@@ -69,6 +73,9 @@ func (t *ReplicaState) AmIPrimary() bool {
 }
 
 func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes string) *pb.ClientResponse {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
 	t.OpNum = t.Log.Add(request.ClientId, request.Operation)
 	response := &pb.ClientResponse{RequestNum: request.RequestNum, Response: operationRes, OperationNum: t.OpNum}
 	t.ClientTable.SaveRequest(request, response)
@@ -76,6 +83,9 @@ func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes s
 }
 
 func (t *ReplicaState) Commit(operationNum int) (uint32, error) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
 	_, err := t.Log.Commit(operationNum)
 	if err == nil {
 		t.CommitNum = max(uint32(operationNum), t.CommitNum)

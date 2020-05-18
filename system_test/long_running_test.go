@@ -11,7 +11,7 @@ const ADDRESS = ":2600"
 
 func Test_ReplicationOnLongRunningExecution(t *testing.T) {
 	clientCount := 10
-	requestCount := 10000
+	requestCount := 100
 	clientStatus := make(chan bool, clientCount)
 
 	for _, client := range NewClients(clientCount, ADDRESS) {

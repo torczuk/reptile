@@ -20,5 +20,5 @@ func await(condition fn, pool time.Duration, maxTime time.Duration) {
 }
 
 func NewClient(id string, address string) *client.ReptileClient {
-	return &client.ReptileClient{Id: "any-client", Address: ":2600", RequestNum: 1}
+	return &client.ReptileClient{Id: id, Address: address, RequestNum: 1}
 }
