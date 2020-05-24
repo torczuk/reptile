@@ -7,7 +7,10 @@ import (
 	"github.com/torczuk/reptile/server/reptile"
 	"github.com/torczuk/reptile/server/state"
 	logger "log"
+	"sync"
 )
+
+var lock sync.Mutex
 
 func ExecuteOnPrimary(request *client.ClientRequest, replState *state.ReplicaState) (res *client.ClientResponse, err error) {
 	table := replState.ClientTable
@@ -46,6 +49,8 @@ func NotifyReplica(replicaIp string, prepare *server.PrepareReplica, c chan *ser
 }
 
 func ExecuteRequest(request *client.ClientRequest, replState *state.ReplicaState) (res *client.ClientResponse, err error) {
+	lock.Lock()
+	defer lock.Unlock()
 	res, err = ExecuteOnPrimary(request, replState)
 	if err != nil {
 		logger.Printf("error when executing request: %v", err)

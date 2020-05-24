@@ -25,7 +25,7 @@ func (r *ReptileClient) Request(operation string) (*pb.ClientResponse, error) {
 		return nil, err
 	}
 	client := pb.NewReptileClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15 * time.Second)
 	defer cancel()
 	res, err := client.Request(ctx, &pb.ClientRequest{RequestNum: r.RequestNum, ClientId: r.Id, Operation: operation})
 	r.RequestNum += 1
