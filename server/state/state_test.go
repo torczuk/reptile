@@ -68,13 +68,13 @@ func TestNewCommitNum_WhenCommitSucceed(t *testing.T) {
 	state.Log.Add("some-client", "2-3")
 	commitNum, err := state.Commit(0)
 	assert.Nil(t, err)
-	assert.Equal(t, uint32(0), commitNum)
+	assert.Equal(t, int32(0), commitNum)
 
 	//second entry in log
 	state.Log.Add("some-client", "2+3")
 	commitNum, err = state.Commit(1)
 	assert.Nil(t, err)
-	assert.Equal(t, uint32(1), commitNum)
+	assert.Equal(t, int32(1), commitNum)
 }
 
 func TestNewCommitNum_WhenCommitFailed(t *testing.T) {
@@ -84,12 +84,12 @@ func TestNewCommitNum_WhenCommitFailed(t *testing.T) {
 	state.Log.Add("some-client", "2-3")
 	commitNum, err := state.Commit(0)
 	assert.Nil(t, err)
-	assert.Equal(t, uint32(0), commitNum)
+	assert.Equal(t, int32(0), commitNum)
 
 	//second entry in log
 	state.Log.Add("some-client", "2+3")
 	//wrong commitNum
 	commitNum, err = state.Commit(2)
 	assert.NotNil(t, err)
-	assert.Equal(t, uint32(0), commitNum)
+	assert.Equal(t, int32(0), commitNum)
 }

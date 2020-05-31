@@ -13,7 +13,7 @@ const ADDRESS = ":2600"
 
 func Test_ReplicationOnLongRunningExecution(t *testing.T) {
 	clientCount := 100
-	requestCount := 100
+	requestCount := 10
 	clientStatus := make(chan bool, clientCount)
 
 	before := time.Now().Unix()

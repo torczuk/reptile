@@ -42,7 +42,7 @@ func (r *ReptileClient) Log() ([]*pb.ClientLog, error) {
 		return nil, nil
 	}
 	client := pb.NewReptileClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15 * time.Second)
 	defer cancel()
 	stream, err := client.Log(ctx, &empty.Empty{})
 	if err != nil {

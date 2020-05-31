@@ -13,7 +13,7 @@ message PrepareReplica {
   string clientId = 3;
   uint32 clientReqNum = 4;
   uint32 operationNum = 5;
-  uint32 commitNum = 6;
+  int32 commitNum = 6;
 }
 
 message PrepareOk {
@@ -23,5 +23,5 @@ message PrepareOk {
 }
 
 message HeartBeat {
-  uint32 commitNum = 1;
+  int32 commitNum = 1;
 }

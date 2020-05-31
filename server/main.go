@@ -41,7 +41,7 @@ func (s *reptileServer) Prepare(ct context.Context, in *server.PrepareReplica) (
 }
 
 func (s *reptileServer) SendHeartBeat(ct context.Context, in *server.HeartBeat) (*server.HeartBeat, error) {
-	return backup.HeartBean(in, replConf)
+	return backup.HeartBeat(in, replConf)
 }
 
 func main() {
@@ -83,7 +83,7 @@ func scheduleHeartBeat(replState *state.ReplicaState) {
 		reptileCli := reptile.NewReptileClient(ip)
 		task := func() {
 			commitNum := replState.CommitNum
-			reptileCli.SendHeartBeat(&server.HeartBeat{CommitNum: commitNum})
+			reptileCli.SendHeartBeat(&server.HeartBeat{CommitNum: int32(commitNum)})
 		}
 		go executor.NewExecutor(task, 500*time.Millisecond).Start()
 	}

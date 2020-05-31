@@ -9,8 +9,15 @@ import (
 )
 
 func Prepare(request *server.PrepareReplica, replState *state.ReplicaState) (res *server.PrepareOk, err error) {
-	logger.Printf("preparing request %v", request)
+	logger.Printf("preparing request %v, %v", request, request.CommitNum)
 	replState.OpNum = replState.OpNum + 1
+
+	 if request.CommitNum >= 0 {
+		_, err = replState.Commit(int(request.CommitNum))
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	cliReq := client.NewClientRequest(request.ClientOperation, request.ClientId, request.ClientReqNum)
 	cliRes := client.NewClientResponse(cliReq.RequestNum, fmt.Sprintf("Response: %v", cliReq.Operation), replState.OpNum)
@@ -21,7 +28,9 @@ func Prepare(request *server.PrepareReplica, replState *state.ReplicaState) (res
 	return &server.PrepareOk{View: replState.ViewNum, OperationNum: request.OperationNum, ReplicaNum: uint32(replState.MyAddress)}, nil
 }
 
-func HeartBean(request *server.HeartBeat, replState *state.ReplicaState) (*server.HeartBeat, error) {
-	_, err := replState.Commit(int(request.CommitNum))
+func HeartBeat(request *server.HeartBeat, replState *state.ReplicaState) (res *server.HeartBeat, err error) {
+	if request.CommitNum >= 0 {
+		_, err = replState.Commit(int(request.CommitNum))
+	}
 	return &server.HeartBeat{CommitNum: request.CommitNum}, err
 }

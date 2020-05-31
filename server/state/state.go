@@ -3,6 +3,7 @@ package state
 import (
 	"fmt"
 	pb "github.com/torczuk/reptile/protocol/client"
+	logger "log"
 	"strings"
 	"sync"
 )
@@ -23,7 +24,7 @@ type ReplicaState struct {
 	// log - opNum queue
 	Log *Log
 	// last committed opNum
-	CommitNum uint32
+	CommitNum int32
 	//client table, contains registered client and its last response
 	ClientTable *ClientTable
 
@@ -34,7 +35,7 @@ type ReplicaState struct {
 func NewReplicaState() *ReplicaState {
 	log := NewLog()
 	table := NewClientTable()
-	return &ReplicaState{Log: log, ClientTable: table, lock: &sync.Mutex{}}
+	return &ReplicaState{Log: log, ClientTable: table, lock: &sync.Mutex{}, CommitNum: -1}
 }
 
 func (t *ReplicaState) String() string {
@@ -82,13 +83,15 @@ func (t *ReplicaState) RegisterRequest(request *pb.ClientRequest, operationRes s
 	return response
 }
 
-func (t *ReplicaState) Commit(operationNum int) (uint32, error) {
+func (t *ReplicaState) Commit(operationNum int) (int32, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	_, err := t.Log.Commit(operationNum)
 	if err == nil {
-		t.CommitNum = max(uint32(operationNum), t.CommitNum)
+		t.CommitNum = max(int32(operationNum), t.CommitNum)
+	} else {
+		logger.Printf("commit %v failed", operationNum)
 	}
 	return t.CommitNum, err
 }
@@ -97,7 +100,7 @@ func (t *ReplicaState) IsCommitted(operationNum int) bool {
 	return t.Log.IsCommitted(operationNum)
 }
 
-func max(x, y uint32) uint32 {
+func max(x, y int32) int32 {
 	if x < y {
 		return y
 	}
